@@ -1,5 +1,5 @@
 
-boggle: main.o random.o board.o word.o
+boggle: main.o random.o board.o
 	gcc -o boggle $^
 
 %.o: %.c boggle.h

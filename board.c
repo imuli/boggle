@@ -59,32 +59,31 @@ board_string(){
   return NULL;
 }
  
-int
+static int
 board_word(char *word, int position, char *used){
   const char *p;
   int i;
-  if(used[position]==1) return -1;
+  if(used[position]==1) return 0;
   used[position]=1;
   if(*word=='\0') return 1;
   for(p=adjacency[position];*p!='\0';p++){
     i=*p-'a';
     if(board[i]=='q'){
       if(board[i]==*word && word[1]=='u')
-	if(board_word(word+2,i,used)>0)
-	  return 1;
+	return board_word(word+2,i,used);
     }else{
       if(board[i]==*word)
-	if(board_word(word+1,i,used)>0)
-	  return 1;
+	return board_word(word+1,i,used);
     }
   }
   used[position]=0;
-  return -1;
+  return 0;
 }
 
 int
 board_check(char *word){
   char used[17];
   memset(used, 0, 17);
+  if(strlen(word) < 3) return 0;
   return board_word(word, 16, used);
 }

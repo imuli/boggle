@@ -21,7 +21,7 @@ rand_close(){
 long
 rand_tiny(long n){
   long max;
-  unsigned char r[2];
+  unsigned char r[1];
   max = UCHAR_MAX+1;
   max -= max % n;
   do{

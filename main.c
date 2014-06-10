@@ -3,15 +3,19 @@
 #include <string.h>
 #include "boggle.h"
 
-typedef struct strv *Strv;
-struct strv {
+enum {
+	Wordlen = 41,
+};
+
+typedef struct wordlist *Wordlist;
+struct wordlist {
   char **v;
   int c,max;
 };
 
-Strv
-strv_init(int n){
-  Strv r;
+Wordlist
+wordlist_init(int n){
+  Wordlist r;
   r=malloc(sizeof(*r));
   r->v=malloc(sizeof(*r->v)*n);
   r->c=0;
@@ -20,7 +24,7 @@ strv_init(int n){
 }
 
 int
-strv_add(Strv r, char *s){
+wordlist_add(Wordlist r, char *s){
   if(r->c==r->max){
     r->max*=2;
     r->v=realloc(r->v, sizeof(*r->v)*r->max);
@@ -31,7 +35,7 @@ strv_add(Strv r, char *s){
 }
 
 int
-strv_check(Strv r, char *s){
+wordlist_check(Wordlist r, char *s){
   int i;
   for(i=0;i<r->c;i++)
     if(strcmp(s,r->v[i])==0)
@@ -41,9 +45,10 @@ strv_check(Strv r, char *s){
 
 int
 main(int argc, char **argv){
-  char *word;
-  int wordlen, r, i;
-  Strv wordlist;
+  char word[Wordlen];
+  int r, i;
+  Wordlist wordlist;
+  FILE *wfile;
 
   if(argc<2){
     if(!rand_open())
@@ -54,38 +59,41 @@ main(int argc, char **argv){
     board_set(argv[1]);
   }
    
-  word_open("/usr/share/dict/words");
+  wfile = word_open("/usr/share/dict/words");
 
-  wordlen=41;
-  word=malloc(wordlen);
-  wordlist=strv_init(16);
+/* init wordlist */
+  if(wfile==NULL){
+	perror("word_open");
+	return 1;
+  }
+  do{
+    word_next(wfile, word, sizeof(word));
+    if(strlen(word)>=3)
+      if(board_check(word)>0)
+	printf("%s ",word);
+  }while(*word!='\0');
+  printf("\n");
+  fflush(stdin);
+
+  return 0;
 
   for(;;){
     printf("\ec");	/* clear screen */
     board_string();
     for(i=0;i<wordlist->c;i++)
       printf("%s ", wordlist->v[i]);
-    r = getline(&word, &wordlen, stdin);
+//    r = getline(&word, &wordlen, stdin);
     word[r-1]='\0'; /* remove the newline */
     if(*word=='\0') break;
     if(strlen(word)>=3 && board_check(word)>0 && word_check(word)>0){
-      if(!strv_check(wordlist, word))
-	strv_add(wordlist, word);
+      if(!wordlist_check(wordlist, word))
+	wordlist_add(wordlist, word);
     } else {
       printf("xxx\n");
     }
   }
   free(word);
 
-  word_reset();
-  do{
-    word=word_next();
-    if(strlen(word)>=3)
-      if(board_check(word)>0)
-	if(!strv_check(wordlist,word))
-	  printf("%s ",word);
-  }while(*word!='\0');
-  printf("\n");
   word_close();
   return 0;
 }

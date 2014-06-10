@@ -15,32 +15,31 @@ static char *curword;
 static int curwordlen;
 
 char *
-word_next(){
-  getline(&curword, &curwordlen, fp);
-  if(*curword=='\0') return NULL;
-  curword[strlen(curword)-1]='\0';
-  return curword;
+word_next(FILE *fp, char *word, int wordlen){
+  getline(&word, &wordlen, fp);
+  word[strlen(word)-1]='\0';
+  return word;
 }
 
 long
-word_reset(){
-  return fseek(fp, 1, SEEK_SET);
+word_reset(FILE *fp){
+  return fseek(fp, 0, SEEK_SET);
 }
 
-int
+FILE *
 word_open(const char *word){
   struct stat statb;
+  FILE *fp;
 
-  curword=NULL;
   if((fp = fopen(word, "r")) == NULL)
-    return -1;
+    return NULL;
   if(fstat(fileno(fp), &statb) < 0){
     fclose(fp);
-    return -1;
+    return NULL;
   }
   size = (long)statb.st_size;
 
-  return 1;
+  return fp;
 }
 
 int

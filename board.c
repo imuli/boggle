@@ -12,14 +12,16 @@ static const char *cubes[16] = {
 	"bfiorx", "dknotu", "abjmoq", "egintv"
 };
 
-int board_set(char *it){
+int
+board_set(char *it){
 	if(strlen(it)<16)
 		return -1;
 	memcpy(board, it, 16);
 	return 1;
 }
 
-int board_randomize(){
+int
+board_randomize(){
 	char used[16];
 	int i,j,r;
 

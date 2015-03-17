@@ -1,5 +1,6 @@
 
 int board_randomize();
+int board_set(char *);
 char *board_string();
 int board_check(char *);
 

@@ -1,9 +1,9 @@
 
 boggle: main.o random.o board.o
-	gcc -o boggle $^
+	cc -o boggle $^
 
 %.o: %.c boggle.h
-	gcc -g -c -o $@ $<
+	cc -g -c -o $@ $<
 
 clean:
 	rm *.o boggle
